@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RF Calculator">
+<title>RF Power Calculator</title>
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=u_J0-Jda27KBcmeN0Zf0zxzn3MPM-w4CUuMRM3En7DwzKoABN2klxsDKTR3weNpdsbWziFHzfv-XRBdtIfB8uSzTxuDXJoMp26GPMRl7kDtOHX1WSriOv_NMbiXPshCEgKvGUYbiLL6lfuSs3AkCU2UDxiRCQrpwp1IEUH8sQMVi_e5WgpvV5C9dfmAt9eHyrh9KAGX-2u4taRRhAqhc67l6H5c6ZsA_S6-leHRHgH-RTnNBSvJaFtDHCeZu0g6U95fm_VmdS2wAeuH-oWM45LwmAHFLBTTEGO5Kw0ZOMhPi9UAEbW25bY1Tc8oE5bs2uQj-WE2DRJnmTxQlDhKpAHT_wc5beviukXAGAJV56G0" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9jaGF0Z3B0LmNvbS9iYWNrZW5kLWFwaS9lc3R1YXJ5L2NvbnRlbnQ_aWQ9ZmlsZV8wMDAwMDAwMGFmMjQ4MjA5OTQyOTUyMjcxNDI1N2ZkZCZmbj1SRiUyNTIwUG93ZXIlMjUyMENhbGN1bGF0b3IlMjUyME1vYmlsZS5odG1sJmNkPWF0dGFjaG1lbnQmdHM9NDk3MzkxJnA9ZnMmY2lkPTEmc2lnPWJmNDRhNGFkMzQxOTM1ZWY2NjA3M2E0MGE3OTFhNTEyMmMzZDgzNWEwNjM1MGYzMWVhM2Q1NWQ3NjRmNTViZmImdj0w"/><style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: max(24px, env(safe-area-inset-top)) 16px 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+  }
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.08);
+  }
+  h1 { margin: 0 0 6px; font-size: 25px; }
+  .sub { color: #6b7280; margin-bottom: 22px; }
+  label { display:block; font-weight:700; margin: 17px 0 8px; }
+  input {
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:1px solid #cbd5e1;
+    border-radius:12px;
+    background:#fff;
+    -webkit-appearance:none;
+  }
+  .buttons {
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+  }
+  button {
+    flex:1;
+    padding:15px 10px;
+    font-size:18px;
+    font-weight:700;
+    border:0;
+    border-radius:12px;
+    color:white;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #calcBtn { background:#2563eb; }
+  #clearBtn { background:#64748b; }
+  .result {
+    margin-top:20px;
+    padding:18px;
+    border-radius:14px;
+    background:#eef2ff;
+    text-align:center;
+  }
+  .result-label {
+    font-size:14px;
+    font-weight:700;
+    color:#4b5563;
+    letter-spacing:.08em;
+  }
+  #resultValue {
+    margin-top:5px;
+    font-size:34px;
+    font-weight:800;
+    color:#111827;
+    min-height:42px;
+  }
+  .formula { margin-top:14px; color:#6b7280; font-size:13px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>RF Power Calculator</h1>
+  <div class="sub">RF Max Power Calculator</div>
+
+  <label for="power">Max Power</label>
+  <input id="power" type="number" inputmode="decimal" step="any" placeholder="Enter Max Power">
+
+  <label for="diff">Difference %</label>
+  <input id="diff" type="number" inputmode="decimal" step="any" placeholder="Enter Difference %">
+
+  <div class="buttons">
+    <button id="calcBtn" type="button">Calculate</button>
+    <button id="clearBtn" type="button">Clear</button>
+  </div>
+
+  <div class="result">
+    <div class="result-label">RESULT</div>
+    <div id="resultValue">—</div>
+  </div>
+
+  <div class="formula">
+    Formula: Round(Max Power × (1 + Difference % ÷ 100), 1 decimal place)
+  </div>
+</div>
+
+<script>
+function calculate() {
+  const powerInput = document.getElementById('power');
+  const diffInput = document.getElementById('diff');
+  const resultValue = document.getElementById('resultValue');
+
+  const power = parseFloat(powerInput.value);
+  const diff = parseFloat(diffInput.value);
+
+  if (!Number.isFinite(power) || !Number.isFinite(diff)) {
+    resultValue.textContent = 'Please enter values';
+    return;
+  }
+
+  const result = Math.round(power * (1 + diff / 100) * 10) / 10;
+
+  // Result -> Max Power
+  powerInput.value = result;
+
+  // Difference % -> clear
+  diffInput.value = '';
+
+  // Keep Result visible
+  resultValue.textContent = result;
+
+  // Ready for the next Difference % input
+  diffInput.focus();
+}
+
+function clearAll() {
+  document.getElementById('power').value = '';
+  document.getElementById('diff').value = '';
+  document.getElementById('resultValue').textContent = '—';
+  document.getElementById('power').focus();
+}
+
+document.getElementById('calcBtn').addEventListener('click', calculate);
+document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+document.getElementById('power').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('diff').focus();
+});
+
+document.getElementById('diff').addEventListener('keydown', e => {
+  if (e.key === 'Enter') calculate();
+});
+</script>
+</body>
+</html>
