@@ -1,0 +1,21 @@
+{
+  "name": "RF Power Calculator",
+  "short_name": "RF Calc",
+  "description": "RF Max Power Calculator with percentage offset",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=RF",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=RF",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

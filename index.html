@@ -3,16 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+<!-- PWA / iOS Meta Tags -->
+<meta name="theme-color" content="#2563eb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="RF Calculator">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/2563eb/ffffff?text=RF">
+
 <title>RF Power Calculator</title>
-<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=u_J0-Jda27KBcmeN0Zf0zxzn3MPM-w4CUuMRM3En7DwzKoABN2klxsDKTR3weNpdsbWziFHzfv-XRBdtIfB8uSzTxuDXJoMp26GPMRl7kDtOHX1WSriOv_NMbiXPshCEgKvGUYbiLL6lfuSs3AkCU2UDxiRCQrpwp1IEUH8sQMVi_e5WgpvV5C9dfmAt9eHyrh9KAGX-2u4taRRhAqhc67l6H5c6ZsA_S6-leHRHgH-RTnNBSvJaFtDHCeZu0g6U95fm_VmdS2wAeuH-oWM45LwmAHFLBTTEGO5Kw0ZOMhPi9UAEbW25bY1Tc8oE5bs2uQj-WE2DRJnmTxQlDhKpAHT_wc5beviukXAGAJV56G0" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9jaGF0Z3B0LmNvbS9iYWNrZW5kLWFwaS9lc3R1YXJ5L2NvbnRlbnQ_aWQ9ZmlsZV8wMDAwMDAwMGFmMjQ4MjA5OTQyOTUyMjcxNDI1N2ZkZCZmbj1SRiUyNTIwUG93ZXIlMjUyMENhbGN1bGF0b3IlMjUyME1vYmlsZS5odG1sJmNkPWF0dGFjaG1lbnQmdHM9NDk3MzkxJnA9ZnMmY2lkPTEmc2lnPWJmNDRhNGFkMzQxOTM1ZWY2NjA3M2E0MGE3OTFhNTEyMmMzZDgzNWEwNjM1MGYzMWVhM2Q1NWQ3NjRmNTViZmImdj0w"/><style>
+<style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
     padding: max(24px, env(safe-area-inset-top)) 16px 30px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #f4f6f8;
     color: #1f2937;
   }
@@ -49,6 +55,7 @@
     border:0;
     border-radius:12px;
     color:white;
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
   #calcBtn { background:#2563eb; }
@@ -118,16 +125,10 @@ function calculate() {
 
   const result = Math.round(power * (1 + diff / 100) * 10) / 10;
 
-  // Result -> Max Power
+  // 自動把結果帶入 Max Power，清空 Difference %
   powerInput.value = result;
-
-  // Difference % -> clear
   diffInput.value = '';
-
-  // Keep Result visible
   resultValue.textContent = result;
-
-  // Ready for the next Difference % input
   diffInput.focus();
 }
 
@@ -148,6 +149,15 @@ document.getElementById('power').addEventListener('keydown', e => {
 document.getElementById('diff').addEventListener('keydown', e => {
   if (e.key === 'Enter') calculate();
 });
+
+// 註冊 PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker Registered'))
+      .catch(err => console.log('Service Worker Failed', err));
+  });
+}
 </script>
 </body>
 </html>
