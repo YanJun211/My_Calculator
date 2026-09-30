@@ -27,7 +27,7 @@
   }
   .card {
     max-width: 520px;
-    margin: 0 auto;
+    margin: 0 auto 16px;
     background: #fff;
     border-radius: 20px;
     padding: 24px 20px;
@@ -84,9 +84,59 @@
     min-height:42px;
   }
   .formula { margin-top:14px; color:#6b7280; font-size:13px; line-height:1.5; }
+
+  /* 歷史記錄區域專用 CSS */
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .history-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #374151;
+  }
+  .clear-history-btn {
+    background: transparent;
+    color: #ef4444;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 15px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-detail { color: #4b5563; font-weight: 500; }
+  .history-right { display: flex; align-items: center; gap: 10px; }
+  .history-result { font-weight: 700; color: #2563eb; font-size: 16px; }
+  .delete-item-btn {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .empty-history { text-align: center; color: #9ca3af; padding: 10px 0; font-size: 14px; }
 </style>
 </head>
 <body>
+
 <div class="card">
   <h1>RF Power Calculator</h1>
   <div class="sub">RF Max Power Calculator</div>
@@ -112,7 +162,79 @@
   </div>
 </div>
 
+<!-- 歷史記錄區塊 -->
+<div class="card">
+  <div class="history-header">
+    <span class="history-title">History</span>
+    <button id="clearHistoryBtn" class="clear-history-btn" type="button">Clear All</button>
+  </div>
+  <ul id="historyList" class="history-list"></ul>
+</div>
+
 <script>
+const HISTORY_KEY = 'rf_calc_history_data';
+
+// 取得歷史記錄
+function getHistory() {
+  const data = localStorage.getItem(HISTORY_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+// 儲存歷史記錄
+function saveHistory(list) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
+
+// 渲染歷史記錄列表
+function renderHistory() {
+  const historyList = document.getElementById('historyList');
+  const list = getHistory();
+  historyList.innerHTML = '';
+
+  if (list.length === 0) {
+    historyList.innerHTML = '<li class="empty-history">No history yet</li>';
+    return;
+  }
+
+  list.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.className = 'history-item';
+    li.innerHTML = `
+      <div class="history-detail">
+        ${item.power} × (1 + ${item.diff}%)
+      </div>
+      <div class="history-right">
+        <div class="history-result">= ${item.result}</div>
+        <button class="delete-item-btn" onclick="deleteHistoryItem(${index})">✕</button>
+      </div>
+    `;
+    historyList.appendChild(li);
+  });
+}
+
+// 新增一筆記錄
+function addHistoryItem(power, diff, result) {
+  const list = getHistory();
+  list.unshift({ power, diff, result });
+  if (list.length > 20) list.pop(); // 最多保留最新的 20 筆
+  saveHistory(list);
+  renderHistory();
+}
+
+// 刪除單筆記錄
+function deleteHistoryItem(index) {
+  const list = getHistory();
+  list.splice(index, 1);
+  saveHistory(list);
+  renderHistory();
+}
+
+// 清空所有歷史記錄
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+}
+
 function calculate() {
   const powerInput = document.getElementById('power');
   const diffInput = document.getElementById('diff');
@@ -127,6 +249,9 @@ function calculate() {
   }
 
   const result = Math.round(power * (1 + diff / 100) * 10) / 10;
+
+  // 新增至歷史記錄
+  addHistoryItem(power, diff, result);
 
   // 自動把結果帶入 Max Power，清空 Difference %
   powerInput.value = result;
@@ -144,6 +269,7 @@ function clearAll() {
 
 document.getElementById('calcBtn').addEventListener('click', calculate);
 document.getElementById('clearBtn').addEventListener('click', clearAll);
+document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
 
 document.getElementById('power').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('diff').focus();
@@ -152,6 +278,9 @@ document.getElementById('power').addEventListener('keydown', e => {
 document.getElementById('diff').addEventListener('keydown', e => {
   if (e.key === 'Enter') calculate();
 });
+
+// 初始載入歷史記錄
+renderHistory();
 
 // 註冊 PWA Service Worker
 if ('serviceWorker' in navigator) {
