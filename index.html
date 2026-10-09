@@ -45,6 +45,16 @@
     background:#fff;
     -webkit-appearance:none;
   }
+  .input-group {
+    display: flex;
+    gap: 8px;
+  }
+  .toggle-btn {
+    flex: 0 0 54px;
+    background: #475569;
+    font-size: 20px;
+    border-radius: 12px;
+  }
   .buttons {
     display:flex;
     gap:10px;
@@ -145,7 +155,10 @@
   <input id="power" type="number" inputmode="decimal" step="any" placeholder="Enter Max Power">
 
   <label for="diff">Difference %</label>
-  <input id="diff" type="number" inputmode="decimal" step="any" placeholder="Enter Difference %">
+  <div class="input-group">
+    <input id="diff" type="text" inputmode="decimal" placeholder="Enter Difference %">
+    <button id="toggleSignBtn" class="toggle-btn" type="button">±</button>
+  </div>
 
   <div class="buttons">
     <button id="calcBtn" type="button">Calculate</button>
@@ -266,6 +279,19 @@ function clearAll() {
   document.getElementById('resultValue').textContent = '—';
   document.getElementById('power').focus();
 }
+
+document.getElementById('toggleSignBtn').addEventListener('click', () => {
+  const diffInput = document.getElementById('diff');
+  let val = diffInput.value.trim();
+  if (val.startsWith('-')) {
+    diffInput.value = val.substring(1);
+  } else if (val !== '') {
+    diffInput.value = '-' + val;
+  } else {
+    diffInput.value = '-';
+  }
+  diffInput.focus();
+});
 
 document.getElementById('calcBtn').addEventListener('click', calculate);
 document.getElementById('clearBtn').addEventListener('click', clearAll);
